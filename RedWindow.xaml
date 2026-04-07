@@ -1,0 +1,177 @@
+﻿<Window x:Class="_2_3Laba.RedWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_2_3Laba"
+        mc:Ignorable="d"
+        Title="RedWindow" Height="800" Width="600" Closing="Window_Closing" Topmost="True">
+
+    <Window.Resources>
+        <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+
+        <DataTemplate x:Key="ColorItemTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Rectangle Width="20" Height="20" Margin="2"
+                       Stroke="Black"
+                       Fill="{Binding Converter={StaticResource ColorToBrushConverter}}"/>
+                <TextBlock Text="{Binding}" Margin="5,0,0,0"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <TextBox Text="Дерево зависимостей" IsReadOnly="True" Grid.RowSpan="1" TextChanged="TextBox_TextChanged" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10"/>
+        <TextBox Grid.Column="2" Text="Свойства фигуры" IsReadOnly="True" Grid.RowSpan="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10"/>
+        
+        <ScrollViewer Grid.Column="0" Grid.Row="2" Margin="5,20,5,5" Grid.RowSpan="2"
+      VerticalScrollBarVisibility="Auto">
+            <TreeView x:Name="HierarchyTree" Grid.Row="1" Grid.Column="0"
+  MouseDoubleClick="HierarchyTree_MouseDoubleClick" Margin="10,10,10,10"/>
+        </ScrollViewer>
+
+        <Button x:Name="RedirectToParent" Content="Перейти к родителю" Grid.Row="1" Margin="5,5,5,5" Click="RedirectToParent_Click"/>
+        <!-- Общие кнопки -->
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="ExitGroup" Content="Отвязаться от род." Margin="5,5,5,5"  Grid.Column="0" Click="ExitGroup_Click"/>
+            <Button x:Name="DeleteButton" Content="Удалить" Margin="5,5,5,5" Click="DeleteButton_Click_1" Grid.Column="2"/>
+            <Button x:Name="SaveButton" Content="Сохранить" Margin="5,5,5,5" Grid.Column="1" Click="SaveButton_Click_1"/>
+            
+        </Grid>
+
+
+        <ScrollViewer Grid.Column="2" Grid.Row="2" Margin="5,10,5,20" Grid.RowSpan="2"
+              VerticalScrollBarVisibility="Auto">
+
+
+
+            <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,0" Grid.RowSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="100"/>
+                </Grid.RowDefinitions>
+                <Label x:Name="Borders_Values" Content="Крайние точки" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.ColumnSpan="3"/>
+
+                <Label Content="Имя" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"/>
+                <TextBox x:Name="Figure_Name" Grid.Column="1" TextWrapping="Wrap" Text="" Margin="10,10,10,10" Grid.ColumnSpan="2" TextChanged="Figure_Name_TextChanged" Grid.Row="1"/>
+
+
+
+                <!--меняются на локальные в группы (parent != null -->
+                <Label Content="Глоб. коорд. (x,y)" HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Center"/>
+                <TextBox x:Name="X_cord_glob" Grid.Column="1" Margin="10,10,10,10" Grid.Row="2" TextWrapping="Wrap" Text="TextBlock" TextChanged="X_cord_glob_TextChanged" PreviewTextInput="X_cord_glob_PreviewTextInput_1"/>
+                <TextBox x:Name="Y_cord_glob" Grid.Column="2" Margin="10,10,10,10" Grid.Row="2" TextWrapping="Wrap" Text="TextBlock" PreviewTextInput="Y_cord_glob_PreviewTextInput" TextChanged="Y_cord_glob_TextChanged"/>
+                <Label Content="Лок. смещение центра (x,y)" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Center"/>
+                <TextBox x:Name="X_centr_loc" Grid.Column="1" Margin="10,10,10,10" Grid.Row="3" TextWrapping="Wrap" Text="TextBlock" PreviewTextInput="X_centr_loc_PreviewTextInput" TextChanged="X_centr_loc_TextChanged"/>
+                <TextBox x:Name="Y_centr_loc" Grid.Column="2" Margin="10,10,10,10" Grid.Row="3" TextWrapping="Wrap" Text="TextBlock" PreviewTextInput="Y_centr_loc_PreviewTextInput" TextChanged="Y_centr_loc_TextChanged"/>
+                <Label Content="Масштаб" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox x:Name="Scale_box" Grid.Column="1" Margin="10,10,10,10" Grid.Row="4" TextWrapping="Wrap" Text="" Grid.ColumnSpan="2" TextChanged="Scale_box_TextChanged" PreviewTextInput="Scale_box_PreviewTextInput"/>
+                <Label Content="Вращение" Grid.Row="5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox x:Name="Angle_box" Grid.Column="1" Margin="10,10,10,10" Grid.Row="5" TextWrapping="Wrap" Text="" Grid.ColumnSpan="2" TextChanged="Angle_box_TextChanged"
+ PreviewTextInput="Angle_box_PreviewTextInput"/>
+
+
+                <Label Content="Цвет заливки" Grid.Row="6" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <ComboBox x:Name="FillColorComboBox" Grid.Row="6" Grid.Column="1" ItemTemplate="{StaticResource ColorItemTemplate}" SelectionChanged="FillColorComboBox_SelectionChanged" Grid.ColumnSpan="3" Margin="10,10,10,10"/>
+                <!-- Только для круга -->
+                <Label Content="Цвет линии круга" Grid.Row="7" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0"/>
+                <ComboBox x:Name="Circle_LineColorComboBox"  Grid.Row="7" Grid.Column="1" ItemTemplate="{StaticResource ColorItemTemplate}" SelectionChanged="Circle_LineColorComboBox_SelectionChanged" Grid.ColumnSpan="2" Margin="10,10,10,10"/>
+                <Label Content="Толщина линии круга" Grid.Row="8" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0"/>
+                <TextBox x:Name="Circle_Thickness" Grid.Column="1" Margin="10,10,10,10" Grid.Row="8" TextWrapping="Wrap" Text="" Grid.ColumnSpan="2" TextChanged="Circle_Thickness_TextChanged" PreviewTextInput="Circle_Thickness_PreviewTextInput"/>
+
+                <Rectangle Grid.ColumnSpan="3" Grid.RowSpan="1" Grid.Row="9" Stroke="Black" Fill="#FF5F5F5F"/>
+
+
+                <!-- Выбор линии и её редактирование. Тут должна быть возможность выбрать сторону у многоугольника или подфигуру суперфигуры. В первом случае снизу должны быть поля для 
+    редактирования Толщины линии, её цвета, координат 2 концов. Дополнительно надо оставить поле для длины линии и угла её наклона относительно общей системы координат-->
+
+                <Label Content="Выбор стороны" Grid.Row="10"/>
+                <ComboBox x:Name="SideChoose"
+  Grid.Row="10"
+  Grid.Column="1"
+  Grid.ColumnSpan="2"
+  Margin="10"
+  SelectionChanged="SideChoose_SelectionChanged"/>
+
+                <Label Content="Толщина линии" Grid.Row="11"/>
+                <TextBox x:Name="SideThickness"
+ Grid.Row="11"
+ Grid.Column="1"
+ Grid.ColumnSpan="2"
+ Margin="10"
+ TextChanged="SideThickness_TextChanged"/>
+
+                <Label Content="Цвет линии" Grid.Row="12"/>
+                <ComboBox x:Name="SideColor" Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="2"
+  ItemTemplate="{StaticResource ColorItemTemplate}"
+  Margin="10" SelectionChanged="SideColor_SelectionChanged"/>
+
+                <Label Content="X1 Y1" Grid.Row="13"/>
+                <TextBox x:Name="X1_box" Grid.Row="13" Grid.Column="1" Margin="10" TextChanged="Coord_TextChanged"/>
+                <TextBox x:Name="Y1_box" Grid.Row="13" Grid.Column="2" Margin="10" TextChanged="Coord_TextChanged"/>
+
+                <Label Content="X2 Y2" Grid.Row="14"/>
+                <TextBox x:Name="X2_box" Grid.Row="14" Grid.Column="1" Margin="10" TextChanged="Coord_TextChanged"/>
+                <TextBox x:Name="Y2_box" Grid.Row="14" Grid.Column="2" Margin="10" TextChanged="Coord_TextChanged"/>
+
+                <Label Content="Длина" Grid.Row="15"/>
+                <TextBox x:Name="LengthBox" Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2"
+ Margin="10" TextChanged="LengthBox_TextChanged"/>
+
+                <Label Content="Угол" Grid.Row="16"/>
+                <TextBox x:Name="AngleBox" Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2"
+ Margin="10" TextChanged="AngleBox_TextChanged"/>
+
+
+
+
+
+
+
+            </Grid>
+
+        </ScrollViewer>
+        <Rectangle Grid.Column="1" Grid.ColumnSpan="1" Grid.RowSpan="3" Stroke="Black" Fill="#FF505050"/>
+
+
+
+    </Grid>
+</Window>

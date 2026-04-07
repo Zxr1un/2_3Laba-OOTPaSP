@@ -1,0 +1,56 @@
+﻿<Window x:Class="_2_3Laba.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_2_3Laba"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" Background="#FFC3C3C3">
+    <Grid>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="10*"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Очистить сцену" Click="ClearScene_Click"/>
+                <MenuItem Header="Сохранить сцену" Click="SaveScene_Click"/>
+                <MenuItem Header="Загрузить сцену" Click="LoadScene_Click"/>
+            </MenuItem>
+
+            <!-- СОЗДАНИЕ -->
+            <MenuItem Header="Создать фигуру">
+                <MenuItem Header="Круг" Click="CreateCircle_Click"/>
+                <MenuItem Header="Треугольник" Click="CreateTriangle_Click"/>
+                <MenuItem Header="Квадрат" Click="CreateSquare_Click"/>
+                <MenuItem Header="Трапеция" Click="CreateTrapezioid_Click_Click"/>
+                <MenuItem Header="Пяти" Click="CreatePentagon_Click"/>
+                <MenuItem Header="Многоугольник" Click="CreatePolygon_Click"/>
+            </MenuItem>
+
+            <!-- СОХРАНЁННЫЕ -->
+            <MenuItem x:Name="SavedMenu" Header="Сохранённые">
+                <!-- будет заполняться динамически -->
+            </MenuItem>
+
+            <MenuItem x:Name="Unite" Header="Объеденить" IsEnabled="False" Click="Unite_Click">
+            </MenuItem>
+
+        </Menu>
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="10*"/>
+            </Grid.ColumnDefinitions>
+            <!-- В 0 колонке должна быть иерархия фигур (связи можно проследить по childre от SE.Scene)-->
+            <TreeView x:Name="HierarchyTree" Grid.Column="0" Margin="5"
+          SelectedItemChanged="HierarchyTree_SelectedItemChanged"/>
+            
+            <Canvas x:Name="Canva" Grid.ColumnSpan="1" Grid.RowSpan="1" Background="#FFE1E1E1" Grid.Column="1"/>
+
+        </Grid>
+
+    </Grid>
+</Window>
