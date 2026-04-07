@@ -15,23 +15,40 @@ namespace _2_3Laba.Figures
     public class SuperFigure: FigureMy
     {
         public SuperFigure() {
-            if (this is AllFigures) return;
-            border.Stroke = Brushes.DarkCyan;
-            base_init();
-            canva.Children.Add(border);
-            canva.Children.Add(CenterPoint);
             
         }
+        public override void base_init(bool reinitial = false)
+        {
+            if (this is AllFigures) return;
+            border.Stroke = Brushes.DarkCyan;
+            name = SE.Get_nomber() + "_" + "Объединение";
+            base.base_init(reinitial);
+        }
+
+        public override FigureMy Clone(FigureMy part = null, FigureMy parentCop = null)
+        {
+            FigureMy SF = new SuperFigure();
+            return base.Clone(SF, parentCop);
+        }
+
         public override void setScale(double new_scale)
         {
             double prev_scale = scale;
+            List<Point> local_old = new();
+            foreach (FigureMy ch in children) local_old.Add(getLocal(ch.glob));
             scale = new_scale;
             double delta = scale / prev_scale;
-            foreach (FigureMy ch in children)
+            for(int i =0; i < local_old.Count; i++)
             {
-                ch.glob = getGlobal(new (getLocal(ch.glob).X * delta, getLocal(ch.glob).Y * delta));
-                ch.setScale(ch.scale * delta);
+                Point p = getGlobal(local_old[i]);
+                children[i].d_Move(p.X -children[i].glob.X, p.Y -children[i].glob.Y);
+                children[i].setScale(children[i].scale * delta);
             }
+            //foreach (FigureMy ch in children)
+            //{
+            //    ch.glob = getGlobal(new (getLocal(ch.glob).X * delta, getLocal(ch.glob).Y * delta));
+            //    ch.setScale(ch.scale * delta);
+            //}
             base.setScale(new_scale);
         }
 
@@ -58,14 +75,14 @@ namespace _2_3Laba.Figures
             av_y = av_y / children.Count;
             glob.X = av_x;
             glob.Y = av_y;
-            Update_borders();
             if (children.Count == 0) Delete();
             Move();
         }
         public override void Update_borders()
         {
+            FigureMy Test = this;
             if (children.Count == 0) return;
-
+            Console.WriteLine($"SF children count: {children.Count}");
             double minX = double.MaxValue;
             double minY = double.MaxValue;
             double maxX = double.MinValue;
@@ -101,31 +118,32 @@ namespace _2_3Laba.Figures
 
             return new Point(xNew + center.X, yNew + center.Y);
         }
-        public void Rotate(double newAngle)
+        public void Rotate(double newAngle, double delta_dop_angle = 0)
         {
+            
             List<Point> loc_points = new List<Point>();
             foreach(FigureMy ch in children)
             {
                 Point old_loc = getLocal(ch.glob);
                 loc_points.Add(old_loc);
             }
+            double deltaAngle = newAngle - angle + delta_dop_angle;
             angle = newAngle;
-            for(int i = 0;  i < loc_points.Count; i++)
+            dop_angle += delta_dop_angle;
+            for (int i = 0;  i < loc_points.Count; i++)
             {
                 if (children[i] is SuperFigure SF)
                 {
-                    SF.dop_angle = newAngle;
                     Point n_p = getGlobal(loc_points[i]);
                     double d_x = n_p.X - SF.glob.X, d_y = n_p.Y - SF.glob.Y;
                     SF.d_Move(d_x, d_y);
-                    SF.Rotate(SF.angle);
+                    SF.Rotate(SF.angle, deltaAngle);
                     continue;
                 }
                 children[i].dop_angle = angle + dop_angle;
                 children[i].glob = getGlobal(loc_points[i]);
                 children[i].Move();
             }
-            Update_borders();
             Draw();
         }
 

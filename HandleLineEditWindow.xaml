@@ -1,0 +1,39 @@
+﻿<Window x:Class="_2_3Laba.HandleLineEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Редактор линии" Height="200" Width="300"
+        WindowStyle="ToolWindow"
+        ResizeMode="NoResize">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Длина -->
+        <Label Grid.Row="0" Grid.Column="0" Content="Длина:" VerticalAlignment="Center"/>
+        <TextBox x:Name="LengthBox" Grid.Row="0" Grid.Column="1" Margin="2" TextChanged="ValueChanged"/>
+
+        <!-- Угол -->
+        <Label Grid.Row="1" Grid.Column="0" Content="Угол:" VerticalAlignment="Center"/>
+        <TextBox x:Name="AngleBox" Grid.Row="1" Grid.Column="1" Margin="2" TextChanged="ValueChanged"/>
+
+        <!-- X -->
+        <Label Grid.Row="2" Grid.Column="0" Content="X конца:" VerticalAlignment="Center"/>
+        <TextBox x:Name="XBox" Grid.Row="2" Grid.Column="1" Margin="2" TextChanged="ValueChanged"/>
+
+        <!-- Y -->
+        <Label Grid.Row="3" Grid.Column="0" Content="Y конца:" VerticalAlignment="Center"/>
+        <TextBox x:Name="YBox" Grid.Row="3" Grid.Column="1" Margin="2" TextChanged="ValueChanged"/>
+
+        <!-- Кнопка Применить -->
+        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Применить" Margin="2" Height="30" Click="Apply_Click"/>
+    </Grid>
+</Window>

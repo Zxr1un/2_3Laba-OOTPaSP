@@ -418,6 +418,7 @@ namespace _2_3Laba
         {
             try
             {
+                if (Convert.ToDouble(Scale_box.Text) < 0.0001) return;
                 figure.setScale(Convert.ToDouble(Scale_box.Text));
                 //figure.scale = Convert.ToDouble(Scale_box.Text);
                 //figure.Move();

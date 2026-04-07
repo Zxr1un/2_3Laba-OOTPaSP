@@ -1,5 +1,6 @@
 ﻿using _2_3Laba.Figures;
 using _2_3Laba.Figures.Polygons;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,21 +34,25 @@ namespace _2_3Laba
         private void CreateCircle_Click(object sender, RoutedEventArgs e)
         {
             Circle cir = new Circle();
+            cir.base_init();
         }
 
         private void CreateTriangle_Click(object sender, RoutedEventArgs e)
         {
             Triangle tr = new Triangle();
+            tr.base_init();
         }
 
         private void CreateSquare_Click(object sender, RoutedEventArgs e)
         {
             RectangleMy rec = new RectangleMy();
+            rec.base_init();
         }
 
         private void CreatePolygon_Click(object sender, RoutedEventArgs e)
         {
-
+            HandlePolygon hp = new HandlePolygon();
+            hp.Start();
         }
         private void ClearScene_Click(object sender, RoutedEventArgs e)
         {
@@ -57,11 +62,13 @@ namespace _2_3Laba
         private void CreateTrapezioid_Click_Click(object sender, RoutedEventArgs e)
         {
             Trapezoid trapezoid = new Trapezoid();
+            trapezoid.base_init();
         }
 
         private void CreatePentagon_Click(object sender, RoutedEventArgs e)
         {
             Pentagon pentagon = new Pentagon();
+            pentagon.base_init();
         }
 
         private void SaveScene_Click(object sender, RoutedEventArgs e)
@@ -99,11 +106,28 @@ namespace _2_3Laba
             if(SE.selected.Count > 1)
             {
                 SuperFigure SF = new();
-                foreach (FigureMy s in SE.selected.ToList())
+                SF.base_init();
+                List<FigureMy> copyList = SE.selected.ToList();
+                for (int i = copyList.Count - 1; i >= 0; i--)
+                {
+                    for (int j = copyList.Count - 1; j >= 0; j--)
+                    {
+                        if (i != j && copyList[i].children.Contains(copyList[j]))
+                        {
+                            copyList.RemoveAt(j);
+                        }
+                    }
+                }
+                if (copyList.Count < 2)
+                {
+                    SF.Delete();
+                    return;
+                }
+
+                foreach (FigureMy s in copyList)
                 {
                     SF.AddFigure(s);
                 }
-                SF.name = SE.Get_nomber() + "_" + "Объединение";
                 SE.DeselectAll();
                 SE.Select(SF);
                 

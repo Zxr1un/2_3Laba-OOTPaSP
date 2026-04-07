@@ -19,8 +19,12 @@ namespace _2_3Laba.Figures
 
         public List<Side> sides = new(); //Список сторон
         public List<Point> points = new(); // список точек (относительный)
-        public Polygon poly = null; //полигон фона
-        public Brush color = Brushes.Transparent;
+        public Polygon poly = new Polygon()
+        {
+            Stroke = Brushes.Transparent,
+            Fill = Brushes.Green,
+            StrokeThickness = 2
+        }; //полигон фона
 
 
         public override FigureMy Clone(FigureMy part = null, FigureMy parentCop = null)
@@ -33,24 +37,9 @@ namespace _2_3Laba.Figures
             foreach (Point p in points) {
                 copy.points.Add(new(p.X, p.Y));
             }
-            copy.poly = new Polygon()
-            {
-                Stroke = Brushes.Black,
-                Fill = Brushes.Green,
-                StrokeThickness = 2
-            };
             foreach(Point p in poly.Points) copy.poly.Points.Add(new(p.X,p.Y));
-
             copy.color = color;
-            //copy.base_init();
-            try
-            {
-                copy.canva.Children.Remove(copy.poly);
-                foreach (Side s in copy.sides) {
-                    s.canva.Children.Remove(s.poly);
-                }
-            }
-            catch { }
+
             if (base.Clone(copy, parentCop) is PolygonMy pol)
             {
                 copy = pol;
@@ -65,68 +54,60 @@ namespace _2_3Laba.Figures
         }
         public override void Insert(FigureMy par = null)
         {
-            canva.Children.Add(poly);
-            if(!(this is Side side))
-            {
-                poly.MouseLeftButtonDown += OnLMC;
-                poly.MouseLeftButtonUp += OnLMU;
-                poly.MouseMove += MouseMoving;
-                poly.MouseRightButtonDown += OnRMC;
-            }
-            else
-            {
-                side.poly.MouseRightButtonDown += side.OnClick;
-            }
-                base.Insert(par);
+            base.Insert(par);
         }
 
         public PolygonMy()
         {
-            poly = new Polygon()
-            {
-                Stroke = Brushes.Black,
-                Fill = Brushes.Green,
-                StrokeThickness = 2
-            };
+
         }
-        public override void base_init()
+        public override void base_init(bool reinitial = false)
         {
-            base.base_init();
-            Point start_pos = SE.Get_center();
-            glob = start_pos;
-            if (points.Count <= 1)
+            if(this is Side side1)
             {
+                base.base_init(reinitial);
                 return;
             }
             canva = SE.canva;
+            if (!reinitial)
+            {
+                Point start_pos = SE.Get_center();
+                glob = start_pos;
+            }
+            if (children.Count == 0)
+            {
+                if (points.Count <= 1)
+                {
+                    return;
+                }
+                poly.Points.Clear();
+                foreach (Point p in points)
+                {
+                    poly.Points.Add(getGlobal(p));
+                }
+                for (int i = 0; i < points.Count - 1; i++)
+                {
+                    Side side = new Side(this, getGlobal(points[i]), getGlobal(points[i + 1]));
+                    side.base_init();
+                    side.Index = i;
+                    side.name = "Сторона" + i.ToString();
+                    sides.Add(side);
+                }
+                Side sideLast = new Side(this, getGlobal(points[points.Count - 1]), getGlobal(points[0]));
+                sideLast.base_init();
+                sideLast.Index = points.Count - 1;
+                sideLast.name = "Сторона" + sideLast.Index.ToString();
+                sides.Add(sideLast);
+            }
 
             canva.Children.Add(poly);
-            
-            foreach (Point p in points)
-            {
-                poly.Points.Add(getGlobal(p));
-            }
-            for (int i = 0; i < points.Count - 1; i++)
-            {
-                Side side = new Side(this, getGlobal(points[i]), getGlobal(points[i + 1]));
-                side.Index = i;
-                side.name = "Сторона" + i.ToString();
-                sides.Add(side);
-            }
-            Side sideLast = new Side(this, getGlobal(points[points.Count - 1]), getGlobal(points[0]));
-            sideLast.Index = points.Count - 1;
-            sideLast.name = "Сторона" + sideLast.Index.ToString();
-            sides.Add(sideLast);
-
-            canva.Children.Add(border);
-            canva.Children.Add(CenterPoint);
-            
 
             poly.MouseLeftButtonDown += OnLMC;
             poly.MouseLeftButtonUp += OnLMU;
             poly.MouseMove += MouseMoving;
             poly.MouseRightButtonDown += OnRMC;
             Draw();
+            base.base_init(reinitial);
         }
 
         public override void Draw()
@@ -194,6 +175,7 @@ namespace _2_3Laba.Figures
             b_p2 = new Point(maxX, maxY);
 
             base.Update_borders();
+
         }
 
 
@@ -233,6 +215,7 @@ namespace _2_3Laba.Figures
         public override void Delete()
         {
             base.Delete();
+            if (this is Side) return;
             canva.Children.Remove(poly);
             foreach(Side s in sides)
             {

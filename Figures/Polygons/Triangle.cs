@@ -13,17 +13,11 @@ namespace _2_3Laba.Figures.Polygons
     {
         public Triangle() {
             name = SE.Get_nomber() + "_" + "Треугольник";
-            scale = 1.0;
-            poly = new Polygon()
-            {
-                Stroke = Brushes.Transparent,
-                Fill = Brushes.Transparent,
-                StrokeThickness = 0
-            };
+
             points.Add(new(-50, -28.87));
             points.Add(new(50, -28.87));
             points.Add(new(0, 57.74));
-            base_init();
+
         }
     }
 }

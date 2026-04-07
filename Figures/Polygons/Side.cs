@@ -32,11 +32,6 @@ namespace _2_3Laba.Figures.Polygons
                 clone.color = color;
                 clone.thickness = thickness;
                 clone.Index = Index;
-                try
-                {
-                    clone.canva.Children.Remove(clone.poly);
-                }
-                catch { }
             }
             else return null;
             return base.Clone(clone, parentCop);
@@ -44,7 +39,13 @@ namespace _2_3Laba.Figures.Polygons
 
         public Side(PolygonMy par,Point p1, Point p2) {
             parent = par;
-            //base_init();
+            glob = new Point(p1.X, p1.Y);
+            glob_2 = new Point(p2.X, p2.Y);
+
+        }
+        public override void base_init(bool reinitial = false)
+        {
+            canva = SE.canva;
             if (!parent.children.Contains(this)) parent.children.Add(this);
             poly = new Polygon()
             {
@@ -52,23 +53,23 @@ namespace _2_3Laba.Figures.Polygons
                 Fill = color,
                 StrokeThickness = 1
             };
-            canva = SE.canva;
-            canva.Children.Add(poly);
-            for(int i = 0; i < 4; i++)
+            
+            for (int i = 0; i < 4; i++)
             {
                 poly.Points.Add(glob);
             }
-            UpdatePoints(p1, p2);
+            canva.Children.Add(poly);
+            UpdatePoints(glob, glob_2);
             poly.MouseRightButtonDown += OnClick;
-
-            if(parent is PolygonMy pol)
+            if (parent is PolygonMy pol)
             {
                 poly.MouseLeftButtonDown += pol.OnLMC;
                 poly.MouseLeftButtonUp += pol.OnLMU;
                 poly.MouseMove += pol.MouseMoving;
             }
-            
+            base.base_init(reinitial);
         }
+
         public override void Draw()
         {
             poly.Fill = color;
@@ -214,8 +215,16 @@ namespace _2_3Laba.Figures.Polygons
 
         public override void Delete()
         {
-            parent = null;
+            if (parent != null)
+            {
+                parent.children.Remove(this);
+            }
+
             canva.Children.Remove(poly);
+            canva.Children.Remove(border);
+            canva.Children.Remove(CenterPoint);
+            parent = null;
+
         }
 
 

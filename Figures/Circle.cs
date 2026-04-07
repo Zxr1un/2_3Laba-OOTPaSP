@@ -24,30 +24,27 @@ namespace _2_3Laba.Figures
 
         public Circle()
         {
-            
-            name = SE.Get_nomber() + "_" + "Круг";
+
+        }
+        public override void base_init(bool reinitial = false)
+        {
+            if(name == "Figure") name = SE.Get_nomber() + "_" + "Круг";
             type = "circle";
             canva = SE.canva;
-            scale = 1;
-            color = Brushes.Red;
-
-            stroke_cir = Brushes.Blue;
-            stroke_thickness_cir = 2;
-            Point start_pos = SE.Get_center();
-
-            
+            if (!reinitial)
+            {
+                Point start_pos = SE.Get_center();
+                Move(start_pos.X, start_pos.Y);
+            }
             canva.Children.Add(cir);
-            canva.Children.Add(border);
-            canva.Children.Add(CenterPoint);
-            
 
-            Move(start_pos.X, start_pos.Y);
+            
 
             cir.MouseLeftButtonDown += OnLMC;
             cir.MouseLeftButtonUp += OnLMU;
             cir.MouseMove += MouseMoving;
             cir.MouseRightButtonDown += OnRMC;
-            base_init();
+            base.base_init(reinitial);
         }
 
         public override FigureMy Clone(FigureMy part = null, FigureMy parentCop = null)
@@ -57,22 +54,11 @@ namespace _2_3Laba.Figures
             copy.st_radius = st_radius;
             copy.stroke_thickness_cir = stroke_thickness_cir;
             copy.stroke_cir = stroke_cir;
-            try
-            {
-                copy.canva.Children.Remove(copy.cir);
-            }
-            catch { }
-
             return base.Clone(copy, parentCop);
         }
         public override void Insert(FigureMy par = null)
         {
-            canva.Children.Add(cir);
             base.Insert();
-            cir.MouseLeftButtonDown += OnLMC;
-            cir.MouseLeftButtonUp += OnLMU;
-            cir.MouseMove += MouseMoving;
-            cir.MouseRightButtonDown += OnRMC;
 
         }
 

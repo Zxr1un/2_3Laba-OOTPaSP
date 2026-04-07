@@ -51,18 +51,46 @@ namespace _2_3Laba
             return new Point(x, y);
         }
 
-        public static void Select(FigureMy fig)
+        public static void Select(FigureMy fig, bool isRepeat = false)
         {
-            if(selected.Count != 0 && !Keyboard.IsKeyDown(Key.LeftShift))
+            if(selected.Count != 0 && !Keyboard.IsKeyDown(Key.LeftShift) && !isRepeat)
             {
                 foreach (FigureMy f in selected) f.Deselect();
                 selected.Clear();
                 MW.Unite.IsEnabled = false;
             }
-            if (selected.Contains(fig)) return;
-            if (selected is AllFigures) return;
-            selected.Add(fig);
-            fig.Select();
+            if (fig.parent != null) {
+                if(fig.parent is AllFigures)
+                {
+                    if (selected.Contains(fig)) return;
+                    if (fig is AllFigures) return;
+                    selected.Add(fig);
+                    fig.Select();
+                }
+                else
+                {
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                    {
+                        if (!isRepeat)
+                        {
+                            foreach (FigureMy f in selected) f.Deselect();
+                            selected.Clear();
+                            MW.Unite.IsEnabled = false;
+                        }
+                        if (fig is AllFigures) return;
+                        selected.Add(fig);
+                        fig.Select();
+                        Select(fig.parent, true);
+                    }
+                    else
+                    {
+                        SE.Select(fig.parent);
+                    }
+                }
+                
+            }
+            
+            
             if(selected.Count > 1) MW.Unite.IsEnabled = true;
         }
         public static void DeselectAll()

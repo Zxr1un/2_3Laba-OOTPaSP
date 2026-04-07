@@ -12,18 +12,11 @@ namespace _2_3Laba.Figures.Polygons
     {
         public Trapezoid() {
             name = SE.Get_nomber() + "_" + "Трапеция";
-            scale = 1.0;
-            poly = new Polygon()
-            {
-                Stroke = Brushes.Transparent,
-                Fill = Brushes.Transparent,
-                StrokeThickness = 0
-            };
             points.Add(new(-50, -50));
             points.Add(new(-25, 50));
             points.Add(new(25, 50));
             points.Add(new(50, -50));
-            base_init();
+
         }
     }
 }

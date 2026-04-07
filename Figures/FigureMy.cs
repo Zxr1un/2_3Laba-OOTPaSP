@@ -20,7 +20,7 @@ namespace _2_3Laba.Figures
         public Canvas canva = null;
         public string type = "figure";
         public Point glob = new Point(0, 0);
-        public Brush color = Brushes.Red;
+        public Brush color = Brushes.Transparent;
 
         public Point center_loc = new Point(0, 0);
         public double scale = 1;
@@ -70,24 +70,22 @@ namespace _2_3Laba.Figures
             copy.name = name;
             copy.b_p1 = new(b_p1.X, b_p1.Y);
             copy.b_p2 = new(b_p2.X, b_p2.Y);
-            copy.border = new Rectangle()
-            {
-                Visibility = border.Visibility,
-                StrokeThickness = border.StrokeThickness,
-                Stroke = border.Stroke,
-                Fill = border.Fill,
-                IsHitTestVisible = border.IsHitTestVisible
-            };
-            copy.CenterPoint = new Ellipse()
-            {
-                Fill = CenterPoint.Fill,
-                StrokeThickness = CenterPoint.StrokeThickness,
-                Stroke = CenterPoint.Stroke,
-                Width = CenterPoint.Width,
-                Height = CenterPoint.Height,
-                Visibility = CenterPoint.Visibility,
-                IsHitTestVisible= CenterPoint.IsHitTestVisible
-            };
+
+            copy.border.Visibility = border.Visibility;
+            copy.border.StrokeThickness = border.StrokeThickness;
+            copy.border.Stroke = border.Stroke;
+            copy.border.Fill = border.Fill;
+            copy.border.IsHitTestVisible = border.IsHitTestVisible;
+
+
+            copy.CenterPoint.Fill = CenterPoint.Fill;
+            copy.CenterPoint.StrokeThickness = CenterPoint.StrokeThickness;
+            copy.CenterPoint.Stroke = CenterPoint.Stroke;
+            copy.CenterPoint.Width = CenterPoint.Width;
+            copy.CenterPoint.Height = CenterPoint.Height;
+            copy.CenterPoint.Visibility = CenterPoint.Visibility;
+            copy.CenterPoint.IsHitTestVisible = CenterPoint.IsHitTestVisible;
+
             copy.parent = parentCop;
             foreach(FigureMy ch in children)
             {
@@ -97,31 +95,22 @@ namespace _2_3Laba.Figures
                     copy.children.Add(copyCh);
                 }
             }
-            try
-            {
-                copy.canva.Children.Remove(copy.border);
-                copy.canva.Children.Remove(copy.CenterPoint);
-                SE.Scene.children.Remove(copy);
-            }
-            catch (Exception ex) { }
-            SE.UpdateHierarchy();
             return copy;
         }
         public virtual void Insert(FigureMy par = null)
         {
+            FigureMy test = this;
             if (par == null) {
                 parent = SE.Scene;
                 SE.Scene.children.Add(this);
             }
             else parent = par;
-            canva.Children.Add(border);
-            canva.Children.Add(CenterPoint);
             foreach(FigureMy ch in children)
             {
                 ch.Insert(this);
             }
-            Draw();
-            SE.UpdateHierarchy();
+            base_init(true);
+            Move();
         }
 
         public FigureMy(string Name = "Figure")
@@ -129,13 +118,15 @@ namespace _2_3Laba.Figures
             //name = SE.Get_nomber() + "_" + Name;
             canva = SE.canva;
         }
-        public virtual void base_init()
+        public virtual void base_init(bool reinitial = false)
         {
             if(parent == null && !(this is Side) && !(this is AllFigures))
             {
                 parent = SE.Scene;
                 SE.Scene.children.Add(this);
             }
+            canva.Children.Add(border);
+            canva.Children.Add(CenterPoint);
             SE.UpdateHierarchy();
 
         }
@@ -206,7 +197,7 @@ namespace _2_3Laba.Figures
 
             Canvas.SetLeft(border, x);
             Canvas.SetTop(border, y);
-
+            FigureMy test = this;
             if (parent != null) parent.Update_borders();
         }
         public virtual void Edit()
@@ -250,22 +241,9 @@ namespace _2_3Laba.Figures
         }
         public virtual void Select()
         {
-            
-            if (parent != null && !(parent is AllFigures))
-            {
-                SE.Select(parent);
-                if (Keyboard.IsKeyDown(Key.RightCtrl))
-                {
-                    border.Visibility = Visibility.Visible;
-                    CenterPoint.Visibility = Visibility.Visible;
-                }
-            }
-            else
-            {
-                border.Visibility = Visibility.Visible;
-                CenterPoint.Visibility = Visibility.Visible;
-            }
-            
+            border.Visibility = Visibility.Visible;
+            CenterPoint.Visibility = Visibility.Visible;
+            if(parent != null && !(parent is AllFigures)) parent.Select();
         }
 
         public virtual void Rejection()
