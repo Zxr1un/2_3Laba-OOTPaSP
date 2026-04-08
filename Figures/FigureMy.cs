@@ -2,15 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+
+
 
 namespace _2_3Laba.Figures
 {
@@ -296,6 +302,88 @@ namespace _2_3Laba.Figures
             return new Point(xr / scale - center_loc.X, yr / scale - center_loc.Y);
         }
 
-        
+
+
+        public virtual string serialization(int tabs = 0, string post = "")
+        {
+            string indent = new string('\t', tabs);
+            string indentIn = new string('\t', (tabs + 1));
+
+            StringBuilder SB = new();
+            SB.AppendLine($"{indent}{{");
+            SB.AppendLine($"{indentIn}\"type\": \"{type}\",");
+            SB.AppendLine($"{indentIn}\"name\": \"{name}\",");
+            SB.AppendLine($"{indentIn}\"glob\": {{\"X\": {glob.X.ToString(CultureInfo.InvariantCulture)}, \"Y\": {glob.Y.ToString(CultureInfo.InvariantCulture)}}},");
+            SB.AppendLine($"{indentIn}\"center_loc\": {{\"X\": {center_loc.X.ToString(CultureInfo.InvariantCulture)}, \"Y\": {center_loc.Y.ToString(CultureInfo.InvariantCulture)}}},");
+            SB.AppendLine($"{indentIn}\"scale\": {scale.ToString(CultureInfo.InvariantCulture)},");
+            SB.AppendLine($"{indentIn}\"angle\": {angle.ToString(CultureInfo.InvariantCulture)},");
+            SB.AppendLine($"{indentIn}\"b_p1\": {{\"X\": {b_p1.X.ToString(CultureInfo.InvariantCulture)}, \"Y\": {b_p1.Y.ToString(CultureInfo.InvariantCulture)}}},");
+            SB.AppendLine($"{indentIn}\"b_p2\": {{\"X\": {b_p2.X.ToString(CultureInfo.InvariantCulture)}, \"Y\": {b_p2.Y.ToString(CultureInfo.InvariantCulture)}}},");
+            SB.AppendLine($"{indentIn}\"childrens\":");
+
+            if (!string.IsNullOrEmpty(post))
+            {
+                SB.AppendLine($"{indentIn}{post.TrimEnd(',')},");
+            }
+
+            // Сериализация детей
+            SB.AppendLine($"{indentIn}\"children\": [");
+            for (int i = 0; i < children.Count; i++)
+            {
+                SB.Append(children[i].serialization(tabs + 2));
+                if (i != children.Count - 1) SB.AppendLine(",");
+                else SB.AppendLine();
+            }
+            SB.AppendLine($"{indentIn}]");
+            SB.Append($"{indent}}}");
+            return SB.ToString();
+        }
+
+        public virtual FigureMy deserialization(string inp, FigureMy par = null)
+        {
+            FigureMy NF = new FigureMy();
+            
+            string type_1 = ""; //переместиться к первому полю с именем "type":  и начать читать что после, кроме запятой и кавычек
+            if (type_1 == "circle")
+            {
+                NF = new Circle();
+                NF.type = type_1;
+            }
+            else if (type == "polygon")
+            {
+                NF = new PolygonMy();
+                NF.type = type_1;
+            }
+            else if (type == "side")
+            {
+                NF = new Side(null, new(0,0), new(0,0));
+                NF.type = type_1;
+            }
+            else if (type == "superfigure")
+            {
+                NF = new SuperFigure();
+                NF.type = type_1;
+            }
+            if (par != null) NF.parent = par;
+            NF.name = ""; //переместиться к первому полю с именем "name": и то же самое
+            //и т.д.
+           
+
+            while (true)
+            {
+                NF.children.Add(deserialization(inp, NF));
+                if (inp[0] == '}') break; //когда скобка с перечислением children закрывается
+            }
+
+            return new FigureMy();
+        }
+
+        public virtual string deserialization_after(string inp)
+        {
+            //свои дозагрузки нужных полей
+            return inp;
+        }
+
+
     }
 }

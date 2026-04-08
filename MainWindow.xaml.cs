@@ -27,6 +27,7 @@ namespace _2_3Laba
             SE.canva = Canva;
             SE.Register(HierarchyTree);
             HierarchyTree.MouseDoubleClick += HierarchyTree_MouseDoubleClick;
+            this.WindowState = WindowState.Maximized;
 
         }
 
@@ -132,6 +133,40 @@ namespace _2_3Laba
                 SE.Select(SF);
                 
             }
+        }
+
+        private void Canva_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+            if (e.OriginalSource == Canva)
+            {
+                SE.DeselectAll();
+            }
+        }
+
+
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Minimize_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void Maximize_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.WindowState == WindowState.Normal)
+                this.WindowState = WindowState.Maximized;
+            else
+                this.WindowState = WindowState.Normal;
+        }
+
+        // Чтобы окно перетаскивалось за меню:
+        private void Menu_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.DragMove();
         }
     }
 }

@@ -129,5 +129,10 @@ namespace _2_3Laba.Figures
             base.Delete();
             canva.Children.Remove(cir);
         }
+        public override string serialization(int tabs = 0, string post = "")
+        {
+
+            return base.serialization(tabs, post);
+        }
     }
 }

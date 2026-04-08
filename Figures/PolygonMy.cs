@@ -74,6 +74,7 @@ namespace _2_3Laba.Figures
                 Point start_pos = SE.Get_center();
                 glob = start_pos;
             }
+            canva.Children.Add(poly);
             if (children.Count == 0)
             {
                 if (points.Count <= 1)
@@ -100,7 +101,7 @@ namespace _2_3Laba.Figures
                 sides.Add(sideLast);
             }
 
-            canva.Children.Add(poly);
+           
 
             poly.MouseLeftButtonDown += OnLMC;
             poly.MouseLeftButtonUp += OnLMU;

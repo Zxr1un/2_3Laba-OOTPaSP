@@ -1,7 +1,9 @@
 ﻿// HandleLineEditWindow.xaml.cs
+using _2_3Laba.Figures;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace _2_3Laba
 {
@@ -12,9 +14,21 @@ namespace _2_3Laba
 
         private bool suppressEvent = false;
 
+        public HandlePolygon ParentPolygon { get; set; }
+
         public HandleLineEditWindow()
         {
             InitializeComponent();
+            this.PreviewKeyDown += HandleLineEditWindow_PreviewKeyDown;
+        }
+
+        private void HandleLineEditWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true; // чтобы окно не обработало Space
+                ParentPolygon?.FinishPolygonWithSpace();
+            }
         }
 
         public bool IsFocusedByUser => this.IsActive;
@@ -22,7 +36,6 @@ namespace _2_3Laba
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
-            // когда окно активно, флаг можно использовать
         }
 
         protected override void OnDeactivated(EventArgs e)
@@ -34,10 +47,15 @@ namespace _2_3Laba
         public void UpdateValues(double length, double angle, double x2, double y2)
         {
             suppressEvent = true;
+
+            // Показываем острый угол
+            double displayAngle = Math.Abs(180 - Math.Abs(angle));
+
             LengthBox.Text = Math.Round(length, 2).ToString();
-            AngleBox.Text = Math.Round(angle, 2).ToString();
+            AngleBox.Text = Math.Round(displayAngle, 2).ToString();
             XBox.Text = Math.Round(x2, 2).ToString();
             YBox.Text = Math.Round(y2, 2).ToString();
+
             suppressEvent = false;
         }
 
@@ -50,12 +68,14 @@ namespace _2_3Laba
             if (!double.TryParse(XBox.Text, out double x)) return;
             if (!double.TryParse(YBox.Text, out double y)) return;
 
-            // Определяем источник изменения
+            // Преобразуем обратно в глобальный угол (для HandlePolygon)
+            double angleForPolygon = 180 - ang;
+
             var box = sender as TextBox;
             if (box == LengthBox || box == AngleBox)
             {
                 // Меняем длину/угол → пересчитываем конечную точку
-                LineChanged?.Invoke(len, ang, 0, 0);
+                LineChanged?.Invoke(len, angleForPolygon, 0, 0);
             }
             else
             {
@@ -71,7 +91,9 @@ namespace _2_3Laba
             if (!double.TryParse(XBox.Text, out double x)) return;
             if (!double.TryParse(YBox.Text, out double y)) return;
 
-            LineApplied?.Invoke(len, ang, x, y);
+            double angleForPolygon = 180 - ang;
+
+            LineApplied?.Invoke(len, angleForPolygon, x, y);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using _2_3Laba.Figures;
+﻿// HandlePolygon.cs
+using _2_3Laba.Figures;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -9,7 +10,7 @@ using System.Windows.Shapes;
 
 namespace _2_3Laba.Figures
 {
-    internal class HandlePolygon : FigureMy
+    public class HandlePolygon : FigureMy
     {
         private List<Point> points = new();
         private Line currentLine = null;
@@ -17,6 +18,10 @@ namespace _2_3Laba.Figures
         private Canvas canvas;
         private bool isDrawing = false;
         private HandleLineEditWindow lineEditWindow = null;
+
+        public double dop_angle = 0;       // глобальный угол последней линии
+        private List<double> angles = new List<double>();
+        public double angle_cur = 0;
 
         public HandlePolygon()
         {
@@ -47,6 +52,13 @@ namespace _2_3Laba.Figures
                 Left = canvas.PointToScreen(start).X + 20,
                 Top = canvas.PointToScreen(start).Y + 20
             };
+            lineEditWindow = new HandleLineEditWindow
+            {
+                Owner = Application.Current.MainWindow,
+                ParentPolygon = this, // <--- ссылка на HandlePolygon
+                Left = canvas.PointToScreen(start).X + 20,
+                Top = canvas.PointToScreen(start).Y + 20
+            };
 
             lineEditWindow.LineApplied += ApplyLineFromWindow;
             lineEditWindow.LineChanged += (len, ang, x2, y2) =>
@@ -70,8 +82,7 @@ namespace _2_3Laba.Figures
             };
         }
 
-        // ===================== ПЕРЕСЕЧЕНИЯ =====================
-
+        // ================= ПЕРЕСЕЧЕНИЯ =================
         private double Cross(Point a, Point b, Point c)
         {
             return (b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X);
@@ -106,21 +117,17 @@ namespace _2_3Laba.Figures
         {
             for (int i = 0; i < points.Count - 1; i++)
             {
-                // пропускаем последний сегмент (соседний)
                 if (i == points.Count - 2) continue;
-
                 if (LinesIntersect(last, newPoint, points[i], points[i + 1]))
                     return true;
             }
             return false;
         }
 
-        // ===================== СОБЫТИЯ =====================
-
+        // ================= СОБЫТИЯ =================
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
             if (!isDrawing) return;
-
             Point pos = e.GetPosition(canvas);
             UpdateLineFromWindow(0, 0, pos.X, pos.Y, fromWindow: false);
         }
@@ -132,18 +139,15 @@ namespace _2_3Laba.Figures
             Point pos = e.GetPosition(canvas);
             Point last = points[^1];
 
-            // 🔴 СНАЧАЛА проверка
             if (HasIntersection(last, pos))
             {
                 MessageBox.Show("Пересечение запрещено!");
                 return;
             }
 
-            // ✅ ПОТОМ добавление
-            points.Add(pos);
 
-            if (points.Count > 1)
-                lines.Add(currentLine);
+            points.Add(pos);
+            if (points.Count > 1) lines.Add(currentLine);
 
             currentLine = CreateLine(pos, pos);
             canvas.Children.Add(currentLine);
@@ -162,12 +166,20 @@ namespace _2_3Laba.Figures
                 lines.RemoveAt(lines.Count - 1);
             }
 
+            // восстанавливаем dop_angle предыдущей линии
+            if (angles.Count > 0)
+            {
+                dop_angle = angles[^2]; // последний сохранённый угол
+                angles.RemoveAt(angles.Count - 1);
+            }
+            else dop_angle = 0;
+
             Point last = points[^1];
             currentLine.X1 = last.X;
             currentLine.Y1 = last.Y;
         }
 
-        private void Canvas_KeyDown(object sender, KeyEventArgs e)
+        public void Canvas_KeyDown(object sender, KeyEventArgs e)
         {
             if (!isDrawing) return;
 
@@ -177,13 +189,18 @@ namespace _2_3Laba.Figures
                 canvas.Children.Remove(currentLine);
                 lines.Clear();
                 points.Clear();
+                angles.Clear();
                 isDrawing = false;
                 DetachEvents();
             }
             else if (e.Key == Key.Space && points.Count > 2)
             {
+                // сначала фиксируем текущую линию
+                CommitCurrentLine();
+
                 Point g_c = SE.Get_center();
                 PolygonMy poly = new PolygonMy();
+                poly.name = SE.Get_nomber() + "_" + "Своя фигура";
 
                 foreach (var p in points)
                     poly.points.Add(new Point(p.X - g_c.X, p.Y - g_c.Y));
@@ -194,14 +211,14 @@ namespace _2_3Laba.Figures
                 canvas.Children.Remove(currentLine);
                 lines.Clear();
                 points.Clear();
+                angles.Clear();
 
                 isDrawing = false;
                 DetachEvents();
             }
         }
 
-        // ===================== ОБНОВЛЕНИЕ ЛИНИИ =====================
-
+        // ================= ОБНОВЛЕНИЕ ЛИНИИ =================
         private void UpdateLineFromWindow(double length, double angle, double x2, double y2, bool fromWindow)
         {
             if (!isDrawing || points.Count == 0) return;
@@ -209,14 +226,23 @@ namespace _2_3Laba.Figures
             Point start = points[^1];
             Point end;
 
+            // угол последней линии
+            double lastAngleRad = dop_angle * Math.PI / 180.0;
+
             if (!fromWindow) // мышь
             {
                 end = new Point(x2, y2);
 
-                double dx = end.X - start.X;
-                double dy = end.Y - start.Y;
-                length = Math.Sqrt(dx * dx + dy * dy);
-                angle = Math.Atan2(dy, dx) * 180.0 / Math.PI;
+                Vector newVec = end - start;
+                length = newVec.Length;
+
+                double newAngleRad = Math.Atan2(newVec.Y, newVec.X);
+                angle = (newAngleRad * 180.0 / Math.PI); // глобальный угол
+
+                // угол относительно последней линии
+                angle = angle - dop_angle;
+                angle = (angle + 360) % 360; // нормализация
+                if (angle > 180) angle = 360 - angle; // острый угол
             }
             else // окно
             {
@@ -224,14 +250,18 @@ namespace _2_3Laba.Figures
                 {
                     end = new Point(x2, y2);
 
-                    double dx = end.X - start.X;
-                    double dy = end.Y - start.Y;
-                    length = Math.Sqrt(dx * dx + dy * dy);
-                    angle = Math.Atan2(dy, dx) * 180.0 / Math.PI;
+                    Vector newVec = end - start;
+                    length = newVec.Length;
+
+                    double newAngleRad = Math.Atan2(newVec.Y, newVec.X);
+                    angle = (newAngleRad * 180.0 / Math.PI); // глобальный угол
+                    angle = angle - dop_angle;
+                    angle = (angle + 360) % 360;
+                    if (angle > 180) angle = 360 - angle;
                 }
                 else
                 {
-                    double rad = angle * Math.PI / 180.0;
+                    double rad = (dop_angle + angle) * Math.PI / 180.0;
                     end = new Point(start.X + length * Math.Cos(rad),
                                     start.Y + length * Math.Sin(rad));
                 }
@@ -243,11 +273,14 @@ namespace _2_3Laba.Figures
             currentLine.Y2 = end.Y;
 
             lineEditWindow?.UpdateValues(length, angle, end.X, end.Y);
+
+            angle_cur = angle; // сохраняем текущий угол для следующей точки
         }
 
         private void ApplyLineFromWindow(double length, double angle, double x2, double y2)
         {
             UpdateLineFromWindow(length, angle, x2, y2, fromWindow: true);
+
 
             Point end = new Point(currentLine.X2, currentLine.Y2);
             Point last = points[^1];
@@ -258,11 +291,15 @@ namespace _2_3Laba.Figures
                 return;
             }
 
+            Vector newVec = end - last;
+            dop_angle = Math.Atan2(newVec.Y, newVec.X) * 180.0 / Math.PI;
+
             points.Add(end);
             lines.Add(currentLine);
-
+            angles.Add(dop_angle);
             currentLine = CreateLine(end, end);
             canvas.Children.Add(currentLine);
+
         }
 
         private void DetachEvents()
@@ -277,6 +314,56 @@ namespace _2_3Laba.Figures
                 lineEditWindow.Close();
                 lineEditWindow = null;
             }
+        }
+
+        // фиксируем текущую линию
+        private void CommitCurrentLine()
+        {
+            if (!isDrawing || points.Count == 0) return;
+
+            Point last = points[^1];
+            Point end = new Point(currentLine.X2, currentLine.Y2);
+
+            if ((end - last).Length < 0.01) return; // линия слишком маленькая, игнорируем
+
+            if (HasIntersection(last, end))
+            {
+                MessageBox.Show("Пересечение запрещено!");
+                return;
+            }
+
+            points.Add(end);
+            lines.Add(currentLine);
+            angles.Add(dop_angle);
+
+            currentLine = CreateLine(end, end);
+            canvas.Children.Add(currentLine);
+        }
+
+        public void FinishPolygonWithSpace()
+        {
+            if (!isDrawing || points.Count <= 2) return;
+
+            // фиксируем текущую линию
+            CommitCurrentLine();
+
+            Point g_c = SE.Get_center();
+            PolygonMy poly = new PolygonMy();
+            poly.name = SE.Get_nomber() + "_" + "Своя фигура";
+
+            foreach (var p in points)
+                poly.points.Add(new Point(p.X - g_c.X, p.Y - g_c.Y));
+
+            poly.base_init();
+
+            foreach (var line in lines) canvas.Children.Remove(line);
+            canvas.Children.Remove(currentLine);
+            lines.Clear();
+            points.Clear();
+            angles.Clear();
+
+            isDrawing = false;
+            DetachEvents();
         }
     }
 }
