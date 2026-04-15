@@ -1,5 +1,6 @@
 ﻿using _2_3Laba.Figures;
 using _2_3Laba.Figures.Polygons;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -46,6 +47,8 @@ namespace _2_3Laba
 
             SE.Register(HierarchyTree);
 
+            Eccentr_Thickness.IsEnabled = false;
+
             if (figure is PolygonMy polyg)
             {
                 polygonMy = polyg;
@@ -71,6 +74,7 @@ namespace _2_3Laba
                 Y2_box.IsEnabled = false;
                 LengthBox.IsEnabled = false;
                 AngleBox.IsEnabled = false;
+                Eccentr_Thickness.IsEnabled = true;
             }
             if(figure is AllFigures scene)
             {
@@ -129,6 +133,7 @@ namespace _2_3Laba
                 FillColorComboBox.SelectedItem = figure.color.FromBrush();
                 Circle_Thickness.Text = circle.stroke_thickness_cir.ToString("F0");
                 Circle_LineColorComboBox.SelectedItem = circle.stroke_cir.FromBrush();
+                Eccentr_Thickness.Text = circle.e.ToString("F2");
             }
         }
 
@@ -150,9 +155,11 @@ namespace _2_3Laba
             X2_box.Text = p2.X.ToString("F0");
             Y2_box.Text = p2.Y.ToString("F0");
 
+            
+
             var side = polygonMy.sides[i];
             SideThickness.Text = side.thickness.ToString();
-            SideColor.SelectedItem = side.color.FromBrush();
+            SideColor.SelectedItem = side.color_s.FromBrush();
 
             double dx = p2.X - p1.X;
             double dy = p2.Y - p1.Y;
@@ -242,7 +249,7 @@ namespace _2_3Laba
 
             if (SideColor.SelectedItem is FigureColor color)
             {
-                polygonMy.sides[selectedSideIndex].color = color.ToBrush();
+                polygonMy.sides[selectedSideIndex].color_s = color.ToBrush();
                 polygonMy.Draw();
             }
         }
@@ -430,19 +437,19 @@ namespace _2_3Laba
 
         private void X_cord_glob_PreviewTextInput_1(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = !Regex.IsMatch(e.Text, "^[0-9]+$");
+            e.Handled = !Regex.IsMatch(e.Text, "^[0-9\\-]+$");
         }
         private void Y_cord_glob_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = !Regex.IsMatch(e.Text, "^[0-9]+$");
+            e.Handled = !Regex.IsMatch(e.Text, "^[0-9\\-]+$");
         }
         private void X_centr_loc_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = !Regex.IsMatch(e.Text, "^[0-9]+$");
+            e.Handled = !Regex.IsMatch(e.Text, "^[0-9\\-]+$");
         }
         private void Y_centr_loc_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = !Regex.IsMatch(e.Text, "^[0-9]+$");
+            e.Handled = !Regex.IsMatch(e.Text, "^[0-9\\-]+$");
         }
 
         private void Scale_box_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -486,10 +493,29 @@ namespace _2_3Laba
             e.Handled = !Regex.IsMatch(e.Text, "^[0-9\\-]+$");
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
 
+
+
+        private void Eccentr_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if(figure is Circle sir1)
+            {
+                try
+                {
+                    if (Convert.ToDouble(Eccentr_Thickness.Text) < 0.001) return;
+                    sir1.e = Convert.ToDouble(Eccentr_Thickness.Text);
+                    figure.Move();
+                }
+                catch { }
+                
+            }
         }
+
+        private void Eccentr_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !Regex.IsMatch(e.Text, "^[0-9,]+$");
+        }
+
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -544,6 +570,28 @@ namespace _2_3Laba
         {
             SE.SaveFigure(figure);
         }
+
+        private void SaveFigureToFile_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new SaveFileDialog
+            {
+                Title = "Сохранить фигуру/сцену",
+                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                DefaultExt = "json",
+                FileName = "figure.json"
+            };
+
+            bool? result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                string path = dialog.FileName;
+
+                FigureFactory.SaveToFile(figure, path);
+            }
+        }
+
+
     }
 
     public enum FigureColor

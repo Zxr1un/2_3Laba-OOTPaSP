@@ -26,19 +26,20 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <TextBox Text="Дерево зависимостей" IsReadOnly="True" Grid.RowSpan="1" TextChanged="TextBox_TextChanged" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10"/>
+        <TextBox Text="Дерево зависимостей" IsReadOnly="True" Grid.RowSpan="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10"/>
         <TextBox Grid.Column="2" Text="Свойства фигуры" IsReadOnly="True" Grid.RowSpan="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,10,10,10"/>
         
-        <ScrollViewer Grid.Column="0" Grid.Row="2" Margin="5,20,5,5" Grid.RowSpan="2"
-      VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Column="0" Grid.Row="2" Margin="5,20,5,5" Grid.RowSpan="1"
+            VerticalScrollBarVisibility="Auto">
             <TreeView x:Name="HierarchyTree" Grid.Row="1" Grid.Column="0"
-  MouseDoubleClick="HierarchyTree_MouseDoubleClick" Margin="10,10,10,10"/>
+                 MouseDoubleClick="HierarchyTree_MouseDoubleClick" Margin="10,10,10,10"/>
         </ScrollViewer>
 
         <Button x:Name="RedirectToParent" Content="Перейти к родителю" Grid.Row="1" Margin="5,5,5,5" Click="RedirectToParent_Click"/>
@@ -68,6 +69,7 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
                     <RowDefinition Height="50"/>
@@ -116,48 +118,51 @@
                 <ComboBox x:Name="Circle_LineColorComboBox"  Grid.Row="7" Grid.Column="1" ItemTemplate="{StaticResource ColorItemTemplate}" SelectionChanged="Circle_LineColorComboBox_SelectionChanged" Grid.ColumnSpan="2" Margin="10,10,10,10"/>
                 <Label Content="Толщина линии круга" Grid.Row="8" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0"/>
                 <TextBox x:Name="Circle_Thickness" Grid.Column="1" Margin="10,10,10,10" Grid.Row="8" TextWrapping="Wrap" Text="" Grid.ColumnSpan="2" TextChanged="Circle_Thickness_TextChanged" PreviewTextInput="Circle_Thickness_PreviewTextInput"/>
+                <Label Content="Экстренцеситет" Grid.Row="9" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0"/>
+                <TextBox x:Name="Eccentr_Thickness" Grid.Column="1" Margin="10,10,10,10" Grid.Row="9" TextWrapping="Wrap" Text="" Grid.ColumnSpan="2" TextChanged="Eccentr_TextChanged" PreviewTextInput="Eccentr_PreviewTextInput"/>
 
-                <Rectangle Grid.ColumnSpan="3" Grid.RowSpan="1" Grid.Row="9" Stroke="Black" Fill="#FF5F5F5F"/>
+
+                <Rectangle Grid.ColumnSpan="3" Grid.RowSpan="1" Grid.Row="10" Stroke="Black" Fill="#FF5F5F5F"/>
 
 
                 <!-- Выбор линии и её редактирование. Тут должна быть возможность выбрать сторону у многоугольника или подфигуру суперфигуры. В первом случае снизу должны быть поля для 
     редактирования Толщины линии, её цвета, координат 2 концов. Дополнительно надо оставить поле для длины линии и угла её наклона относительно общей системы координат-->
 
-                <Label Content="Выбор стороны" Grid.Row="10"/>
+                <Label Content="Выбор стороны" Grid.Row="11"/>
                 <ComboBox x:Name="SideChoose"
-  Grid.Row="10"
-  Grid.Column="1"
-  Grid.ColumnSpan="2"
-  Margin="10"
-  SelectionChanged="SideChoose_SelectionChanged"/>
+                      Grid.Row="11"
+                      Grid.Column="1"
+                      Grid.ColumnSpan="2"
+                      Margin="10"
+                      SelectionChanged="SideChoose_SelectionChanged"/>  
 
-                <Label Content="Толщина линии" Grid.Row="11"/>
+                <Label Content="Толщина линии" Grid.Row="12"/>
                 <TextBox x:Name="SideThickness"
- Grid.Row="11"
- Grid.Column="1"
- Grid.ColumnSpan="2"
- Margin="10"
- TextChanged="SideThickness_TextChanged"/>
+                     Grid.Row="12"
+                     Grid.Column="1"
+                     Grid.ColumnSpan="2"
+                     Margin="10"
+                     TextChanged="SideThickness_TextChanged"/>
 
-                <Label Content="Цвет линии" Grid.Row="12"/>
-                <ComboBox x:Name="SideColor" Grid.Row="12" Grid.Column="1" Grid.ColumnSpan="2"
-  ItemTemplate="{StaticResource ColorItemTemplate}"
-  Margin="10" SelectionChanged="SideColor_SelectionChanged"/>
+                <Label Content="Цвет линии" Grid.Row="13"/>
+                <ComboBox x:Name="SideColor" Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2"
+                      ItemTemplate="{StaticResource ColorItemTemplate}"
+                      Margin="10" SelectionChanged="SideColor_SelectionChanged"/>
 
-                <Label Content="X1 Y1" Grid.Row="13"/>
-                <TextBox x:Name="X1_box" Grid.Row="13" Grid.Column="1" Margin="10" TextChanged="Coord_TextChanged"/>
-                <TextBox x:Name="Y1_box" Grid.Row="13" Grid.Column="2" Margin="10" TextChanged="Coord_TextChanged"/>
+                <Label Content="X1 Y1" Grid.Row="14"/>
+                <TextBox x:Name="X1_box" Grid.Row="14" Grid.Column="1" Margin="10" TextChanged="Coord_TextChanged"/>
+                <TextBox x:Name="Y1_box" Grid.Row="14" Grid.Column="2" Margin="10" TextChanged="Coord_TextChanged"/>
 
-                <Label Content="X2 Y2" Grid.Row="14"/>
-                <TextBox x:Name="X2_box" Grid.Row="14" Grid.Column="1" Margin="10" TextChanged="Coord_TextChanged"/>
-                <TextBox x:Name="Y2_box" Grid.Row="14" Grid.Column="2" Margin="10" TextChanged="Coord_TextChanged"/>
+                <Label Content="X2 Y2" Grid.Row="15"/>
+                <TextBox x:Name="X2_box" Grid.Row="15" Grid.Column="1" Margin="10" TextChanged="Coord_TextChanged"/>
+                <TextBox x:Name="Y2_box" Grid.Row="15" Grid.Column="2" Margin="10" TextChanged="Coord_TextChanged"/>
 
-                <Label Content="Длина" Grid.Row="15"/>
-                <TextBox x:Name="LengthBox" Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2"
+                <Label Content="Длина" Grid.Row="16"/>
+                <TextBox x:Name="LengthBox" Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2"
  Margin="10" TextChanged="LengthBox_TextChanged"/>
 
                 <Label Content="Угол" Grid.Row="16"/>
-                <TextBox x:Name="AngleBox" Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2"
+                <TextBox x:Name="AngleBox" Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2"
  Margin="10" TextChanged="AngleBox_TextChanged"/>
 
 
@@ -170,6 +175,7 @@
 
         </ScrollViewer>
         <Rectangle Grid.Column="1" Grid.ColumnSpan="1" Grid.RowSpan="3" Stroke="Black" Fill="#FF505050"/>
+        <Button x:Name="SaveFigureToFile" Content="Сохранить фигуру в файл" Margin="10,10,10,10" Grid.Row="3" Click="SaveFigureToFile_Click"/>
 
 
 

@@ -15,7 +15,7 @@ namespace _2_3Laba.Figures
     public class SuperFigure: FigureMy
     {
         public SuperFigure() {
-            
+            type = "superfigure";
         }
         public override void base_init(bool reinitial = false)
         {

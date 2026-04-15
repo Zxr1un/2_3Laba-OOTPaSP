@@ -15,10 +15,10 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Column="0">
-            <MenuItem Header="Файл">
+            <MenuItem Header="Файл" Click="MenuItem_Click">
                 <MenuItem Header="Очистить сцену" Click="ClearScene_Click"/>
                 <MenuItem Header="Сохранить сцену" Click="SaveScene_Click"/>
-                <MenuItem Header="Загрузить сцену" Click="LoadScene_Click"/>
+                <MenuItem Header="Импортировать фигуру/сцену" Click="importFigure_Click"/>
             </MenuItem>
 
             <MenuItem Header="Создать фигуру">

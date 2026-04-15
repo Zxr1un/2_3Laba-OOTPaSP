@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace _2_3Laba
 {
@@ -72,15 +73,7 @@ namespace _2_3Laba
             pentagon.base_init();
         }
 
-        private void SaveScene_Click(object sender, RoutedEventArgs e)
-        {
 
-        }
-
-        private void LoadScene_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void HierarchyTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -167,6 +160,72 @@ namespace _2_3Laba
         private void Menu_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             this.DragMove();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void importFigure_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = "Импорт фигуры / сцены",
+                Filter = "Scene files (*.json)|*.json|All files (*.*)|*.*",
+                DefaultExt = "json",
+                Multiselect = false
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                string path = dialog.FileName;
+
+                string json = System.IO.File.ReadAllText(path);
+
+                FigureMy fig = FigureFactory.Load(json);
+                if(fig is AllFigures AF)
+                {
+                    MessageBoxResult result = System.Windows.MessageBox.Show(
+                        "В файле была обнаружена сцена, загрузить её? (все не сохранённые изменения будут потеряны)",
+                        "Загрузка сцены",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        SE.Scene.Delete();
+                        SE.Scene = AF;
+                        SE.Scene.Insert();
+                    }
+                }
+                else SE.SaveFigure(fig);
+            }
+        }
+
+        private void SaveScene_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog
+            {
+                Title = "Сохранить сцену",
+                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                DefaultExt = "json",
+                FileName = "scene.json"
+            };
+
+            bool? result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                string path = dialog.FileName;
+
+                FigureFactory.SaveToFile(SE.Scene, path);
+            }
+        }
+        //не использую
+        private void LoadScene_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

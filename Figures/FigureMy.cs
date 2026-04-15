@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -22,7 +23,7 @@ namespace _2_3Laba.Figures
 {
     public class FigureMy
     {
-        public Guid Id { get; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         public Canvas canva = null;
         public string type = "figure";
         public Point glob = new Point(0, 0);
@@ -34,7 +35,7 @@ namespace _2_3Laba.Figures
         public double dop_angle = 0;
         public string name = "Figure";
 
-        public Point b_p1 =new(0,0), b_p2 =new(0,0);
+        public Point b_p1 = new(0, 0), b_p2 = new(0, 0);
         public Rectangle border = new Rectangle()
         {
             Visibility = Visibility.Hidden,
@@ -93,10 +94,10 @@ namespace _2_3Laba.Figures
             copy.CenterPoint.IsHitTestVisible = CenterPoint.IsHitTestVisible;
 
             copy.parent = parentCop;
-            foreach(FigureMy ch in children)
+            foreach (FigureMy ch in children)
             {
                 FigureMy copyCh = ch.Clone(null, copy);
-                if(!(copyCh is Side))
+                if (!(copyCh is Side))
                 {
                     copy.children.Add(copyCh);
                 }
@@ -106,12 +107,13 @@ namespace _2_3Laba.Figures
         public virtual void Insert(FigureMy par = null)
         {
             FigureMy test = this;
-            if (par == null) {
+            if (par == null)
+            {
                 parent = SE.Scene;
                 SE.Scene.children.Add(this);
             }
             else parent = par;
-            foreach(FigureMy ch in children)
+            foreach (FigureMy ch in children)
             {
                 ch.Insert(this);
             }
@@ -126,7 +128,7 @@ namespace _2_3Laba.Figures
         }
         public virtual void base_init(bool reinitial = false)
         {
-            if(parent == null && !(this is Side) && !(this is AllFigures))
+            if (parent == null && !(this is Side) && !(this is AllFigures))
             {
                 parent = SE.Scene;
                 SE.Scene.children.Add(this);
@@ -153,7 +155,7 @@ namespace _2_3Laba.Figures
         {
             Move(glob.X, glob.Y);
         }
-        public void  d_Move(double dx, double dy)
+        public void d_Move(double dx, double dy)
         {
             foreach (FigureMy ch in children)
             {
@@ -174,7 +176,7 @@ namespace _2_3Laba.Figures
             //}
             foreach (FigureMy sel in SE.selected)
             {
-                if(sel.parent is AllFigures) sel.d_Move(dx, dy);
+                if (sel.parent is AllFigures) sel.d_Move(dx, dy);
             }
         }
         public virtual void setScale(double new_scale)
@@ -182,11 +184,11 @@ namespace _2_3Laba.Figures
             scale = new_scale;
             Draw();
         }
-        
+
         public virtual void Draw()
         {
             Canvas.SetLeft(CenterPoint, glob.X - CenterPoint.Width / 2);
-            Canvas.SetTop(CenterPoint,glob.Y - CenterPoint.Height / 2);
+            Canvas.SetTop(CenterPoint, glob.Y - CenterPoint.Height / 2);
 
             Update_borders();
             SE.UpdateHierarchy();
@@ -219,10 +221,10 @@ namespace _2_3Laba.Figures
             {
                 parent.children.Remove(this);
             }
-            if(!(this is AllFigures))
+            if (!(this is AllFigures))
             {
                 if (parent != null && parent.children.Count == 0) parent.Delete();
-                else if(parent != null && parent is SuperFigure SF)
+                else if (parent != null && parent is SuperFigure SF)
                 {
                     SF.AddFigure(); //здесь это как перерасчёт
                 }
@@ -249,19 +251,19 @@ namespace _2_3Laba.Figures
         {
             border.Visibility = Visibility.Visible;
             CenterPoint.Visibility = Visibility.Visible;
-            if(parent != null && !(parent is AllFigures)) parent.Select();
+            if (parent != null && !(parent is AllFigures)) parent.Select();
         }
 
         public virtual void Rejection()
         {
-            if(parent != null)
+            if (parent != null)
             {
                 dop_angle = 0;
                 parent.children.Remove(this);
-                if(parent is SuperFigure par) par.AddFigure();
+                if (parent is SuperFigure par) par.AddFigure();
                 parent = SE.Scene;
                 SE.Scene.children.Add(this);
-                SE.UpdateHierarchy();   
+                SE.UpdateHierarchy();
             }
         }
 
@@ -302,88 +304,17 @@ namespace _2_3Laba.Figures
             return new Point(xr / scale - center_loc.X, yr / scale - center_loc.Y);
         }
 
-
-
-        public virtual string serialization(int tabs = 0, string post = "")
+        public virtual void Load(JsonElement el)
         {
-            string indent = new string('\t', tabs);
-            string indentIn = new string('\t', (tabs + 1));
-
-            StringBuilder SB = new();
-            SB.AppendLine($"{indent}{{");
-            SB.AppendLine($"{indentIn}\"type\": \"{type}\",");
-            SB.AppendLine($"{indentIn}\"name\": \"{name}\",");
-            SB.AppendLine($"{indentIn}\"glob\": {{\"X\": {glob.X.ToString(CultureInfo.InvariantCulture)}, \"Y\": {glob.Y.ToString(CultureInfo.InvariantCulture)}}},");
-            SB.AppendLine($"{indentIn}\"center_loc\": {{\"X\": {center_loc.X.ToString(CultureInfo.InvariantCulture)}, \"Y\": {center_loc.Y.ToString(CultureInfo.InvariantCulture)}}},");
-            SB.AppendLine($"{indentIn}\"scale\": {scale.ToString(CultureInfo.InvariantCulture)},");
-            SB.AppendLine($"{indentIn}\"angle\": {angle.ToString(CultureInfo.InvariantCulture)},");
-            SB.AppendLine($"{indentIn}\"b_p1\": {{\"X\": {b_p1.X.ToString(CultureInfo.InvariantCulture)}, \"Y\": {b_p1.Y.ToString(CultureInfo.InvariantCulture)}}},");
-            SB.AppendLine($"{indentIn}\"b_p2\": {{\"X\": {b_p2.X.ToString(CultureInfo.InvariantCulture)}, \"Y\": {b_p2.Y.ToString(CultureInfo.InvariantCulture)}}},");
-            SB.AppendLine($"{indentIn}\"childrens\":");
-
-            if (!string.IsNullOrEmpty(post))
-            {
-                SB.AppendLine($"{indentIn}{post.TrimEnd(',')},");
-            }
-
-            // Сериализация детей
-            SB.AppendLine($"{indentIn}\"children\": [");
-            for (int i = 0; i < children.Count; i++)
-            {
-                SB.Append(children[i].serialization(tabs + 2));
-                if (i != children.Count - 1) SB.AppendLine(",");
-                else SB.AppendLine();
-            }
-            SB.AppendLine($"{indentIn}]");
-            SB.Append($"{indent}}}");
-            return SB.ToString();
+            // базовые поля уже заполнены фабрикой
         }
-
-        public virtual FigureMy deserialization(string inp, FigureMy par = null)
+        public virtual void Save(FigureMy fig, Dictionary<string, object> dict)
         {
-            FigureMy NF = new FigureMy();
-            
-            string type_1 = ""; //переместиться к первому полю с именем "type":  и начать читать что после, кроме запятой и кавычек
-            if (type_1 == "circle")
-            {
-                NF = new Circle();
-                NF.type = type_1;
-            }
-            else if (type == "polygon")
-            {
-                NF = new PolygonMy();
-                NF.type = type_1;
-            }
-            else if (type == "side")
-            {
-                NF = new Side(null, new(0,0), new(0,0));
-                NF.type = type_1;
-            }
-            else if (type == "superfigure")
-            {
-                NF = new SuperFigure();
-                NF.type = type_1;
-            }
-            if (par != null) NF.parent = par;
-            NF.name = ""; //переместиться к первому полю с именем "name": и то же самое
-            //и т.д.
-           
-
-            while (true)
-            {
-                NF.children.Add(deserialization(inp, NF));
-                if (inp[0] == '}') break; //когда скобка с перечислением children закрывается
-            }
-
-            return new FigureMy();
-        }
-
-        public virtual string deserialization_after(string inp)
-        {
-            //свои дозагрузки нужных полей
-            return inp;
+            // базовые поля уже заполнены фабрикой
         }
 
 
     }
+
+
 }

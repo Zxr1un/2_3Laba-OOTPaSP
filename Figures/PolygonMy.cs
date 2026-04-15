@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,13 +44,13 @@ namespace _2_3Laba.Figures
             if (base.Clone(copy, parentCop) is PolygonMy pol)
             {
                 copy = pol;
-                foreach(Side s in copy.children)
+                foreach (Side s in copy.children)
                 {
                     copy.sides.Add(s);
                 }
                 return copy;
             }
-            
+
             return null;
         }
         public override void Insert(FigureMy par = null)
@@ -59,7 +60,7 @@ namespace _2_3Laba.Figures
 
         public PolygonMy()
         {
-
+            type = "polygon";
         }
         public override void base_init(bool reinitial = false)
         {
@@ -75,6 +76,11 @@ namespace _2_3Laba.Figures
                 glob = start_pos;
             }
             canva.Children.Add(poly);
+            poly.Points.Clear();
+            foreach (Point p in points)
+            {
+                poly.Points.Add(getGlobal(p));
+            }
             if (children.Count == 0)
             {
                 if (points.Count <= 1)
@@ -100,15 +106,32 @@ namespace _2_3Laba.Figures
                 sideLast.name = "Сторона" + sideLast.Index.ToString();
                 sides.Add(sideLast);
             }
+            if(sides.Count == 0)
+            {
+                foreach(Side side in children)
+                {
+                    sides.Add(side);
+                }
+            }
+            int minZIndex = 200;
+            foreach (Side side in sides)
+            {
+                int zIndex = Panel.GetZIndex(side.poly);
+                if (zIndex < minZIndex)
+                    minZIndex = zIndex;
+            }
+            Panel.SetZIndex(poly, minZIndex - 1);
 
-           
+
+
 
             poly.MouseLeftButtonDown += OnLMC;
             poly.MouseLeftButtonUp += OnLMU;
             poly.MouseMove += MouseMoving;
             poly.MouseRightButtonDown += OnRMC;
-            Draw();
+            
             base.base_init(reinitial);
+            Draw();
         }
 
         public override void Draw()
@@ -226,6 +249,28 @@ namespace _2_3Laba.Figures
         }
 
 
+        public override void Load(JsonElement el)
+        {
+            if (el.TryGetProperty("points", out var arr))
+            {
+                points = new();
 
+                foreach (var p in arr.EnumerateArray())
+                {
+                    points.Add(new Point(
+                        p.GetProperty("X").GetDouble(),
+                        p.GetProperty("Y").GetDouble()
+                    ));
+                }
+
+            }
+            
+            
+        }
+
+        public override void Save(FigureMy fig, Dictionary<string, object> dict)
+        {
+            dict["points"] = points;
+        }
     }
 }

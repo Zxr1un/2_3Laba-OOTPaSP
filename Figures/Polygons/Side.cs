@@ -1,10 +1,14 @@
 ﻿using _2_3Laba.Figures;
+using _2_3Laba.Figures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Ink;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -20,16 +24,17 @@ namespace _2_3Laba.Figures.Polygons
         public Vector vector;
         public Point glob_2;
         public Point T_P1, T_P2, H_P1, H_P2;
-        public Brush color = Brushes.Red;
+        public Brush color_s = Brushes.Red;
         public int thickness = 10;
 
         public override FigureMy Clone(FigureMy part = null, FigureMy parentCop = null)
         {
+            
             Side clone = null;
             if (parentCop is PolygonMy polClone)
             {
                 clone = new(polClone, new(glob.X, glob.Y), new(glob_2.X, glob_2.Y));
-                clone.color = color;
+                clone.color_s = color_s;
                 clone.thickness = thickness;
                 clone.Index = Index;
             }
@@ -38,6 +43,12 @@ namespace _2_3Laba.Figures.Polygons
         }
 
         public Side(PolygonMy par,Point p1, Point p2) {
+            poly.Points.Clear();
+            for(int i = 0; i < 4; i++)
+            {
+                poly.Points.Add(new Point(0,0));
+            }
+            type = "side";
             parent = par;
             glob = new Point(p1.X, p1.Y);
             glob_2 = new Point(p2.X, p2.Y);
@@ -47,13 +58,11 @@ namespace _2_3Laba.Figures.Polygons
         {
             canva = SE.canva;
             if (!parent.children.Contains(this)) parent.children.Add(this);
-            poly = new Polygon()
-            {
-                Stroke = Brushes.Transparent,
-                Fill = color,
-                StrokeThickness = 1
-            };
-            
+
+            poly.Stroke = Brushes.Transparent;
+            poly.StrokeThickness = 1;
+            poly.Fill = color_s;
+            poly.Points.Clear();
             for (int i = 0; i < 4; i++)
             {
                 poly.Points.Add(glob);
@@ -72,7 +81,7 @@ namespace _2_3Laba.Figures.Polygons
 
         public override void Draw()
         {
-            poly.Fill = color;
+            poly.Fill = color_s;
         }
 
         public void UpdatePoints(Point p1, Point p2, Side prev = null, Side next = null)
@@ -225,6 +234,35 @@ namespace _2_3Laba.Figures.Polygons
             canva.Children.Remove(CenterPoint);
             parent = null;
 
+        }
+
+        public override void Load(JsonElement el)
+        {
+            glob_2 = FigureFactory.GetPoint(el, "glob_2");
+            if (el.TryGetProperty("thickness", out var th)) thickness = (int)th.GetDouble();
+            string color = FigureFactory.GetString(el, "color_s");
+            if (!string.IsNullOrEmpty(color))
+            {
+                try
+                {
+                    color_s = (Brush)new BrushConverter().ConvertFromString(color);
+                }
+                catch
+                {
+                    color_s = Brushes.Red;
+                }
+            }
+
+        }
+
+        public override void Save(FigureMy fig, Dictionary<string, object> dict)
+        {
+            dict["index"] = Index;
+
+            dict["glob_2"] = new { glob_2.X, glob_2.Y };
+
+            dict["thickness"] = thickness;
+            dict["color_s"] = FigureFactory.BrushToString(color_s);
         }
 
 

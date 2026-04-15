@@ -1,5 +1,6 @@
 ﻿using _2_3Laba.Figures;
 using _2_3Laba.Figures;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace _2_3Laba
@@ -16,8 +18,18 @@ namespace _2_3Laba
     {
         public AllFigures() {
             name = "Сцена";
+            type = "scene";
         }
-       
+
+        public override void Insert(FigureMy par = null)
+        {
+            foreach (FigureMy ch in children)
+            {
+                ch.Insert(this);
+            }
+            base_init(true);
+        }
+
         public override void Delete()
         {
             base.Delete();
@@ -227,7 +239,7 @@ namespace _2_3Laba
                     Header = $"{fig.name} ({fig.GetType().Name})"
                 };
 
-                // ➕ Добавить
+                //Добавить
                 MenuItem addItem = new MenuItem
                 {
                     Header = "Добавить"
@@ -237,7 +249,31 @@ namespace _2_3Laba
                     LoadFigure(fig);
                 };
 
-                // ❌ Удалить
+                MenuItem SaveItem = new MenuItem
+                {
+                    Header = "Сохранить в файл"
+                };
+                SaveItem.Click += (s, e) =>
+                {
+                    var dialog = new SaveFileDialog
+                    {
+                        Title = "Сохранить фигуру/сцену",
+                        Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
+                        DefaultExt = "json",
+                        FileName = "figure.json"
+                    };
+
+                    bool? result = dialog.ShowDialog();
+
+                    if (result == true)
+                    {
+                        string path = dialog.FileName;
+
+                        FigureFactory.SaveToFile(fig, path);
+                    }
+                };
+
+                //Удалить
                 MenuItem deleteItem = new MenuItem
                 {
                     Header = "Удалить"
@@ -249,6 +285,7 @@ namespace _2_3Laba
                 };
 
                 figItem.Items.Add(addItem);
+                figItem.Items.Add(SaveItem);
                 figItem.Items.Add(deleteItem);
 
                 MW.SavedMenu.Items.Add(figItem);
