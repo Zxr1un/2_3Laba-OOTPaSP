@@ -34,6 +34,6 @@
         <TextBox x:Name="YBox" Grid.Row="3" Grid.Column="1" Margin="2" TextChanged="ValueChanged"/>
 
         <!-- Кнопка Применить -->
-        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Применить" Margin="2" Height="30" Click="Apply_Click"/>
+        <Button Focusable="False" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Content="Применить" Margin="2" Height="30" Click="Apply_Click"/>
     </Grid>
 </Window>

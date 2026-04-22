@@ -195,26 +195,7 @@ namespace _2_3Laba.Figures
             }
             else if (e.Key == Key.Space && points.Count > 2)
             {
-                // сначала фиксируем текущую линию
-                CommitCurrentLine();
-
-                Point g_c = SE.Get_center();
-                PolygonMy poly = new PolygonMy();
-                poly.name = SE.Get_nomber() + "_" + "Своя фигура";
-
-                foreach (var p in points)
-                    poly.points.Add(new Point(p.X - g_c.X, p.Y - g_c.Y));
-
-                poly.base_init();
-
-                foreach (var line in lines) canvas.Children.Remove(line);
-                canvas.Children.Remove(currentLine);
-                lines.Clear();
-                points.Clear();
-                angles.Clear();
-
-                isDrawing = false;
-                DetachEvents();
+                FinishPolygonWithSpace();
             }
         }
 
@@ -316,36 +297,11 @@ namespace _2_3Laba.Figures
             }
         }
 
-        // фиксируем текущую линию
-        private void CommitCurrentLine()
-        {
-            if (!isDrawing || points.Count == 0) return;
-
-            Point last = points[^1];
-            Point end = new Point(currentLine.X2, currentLine.Y2);
-
-            if ((end - last).Length < 0.01) return; // линия слишком маленькая, игнорируем
-
-            if (HasIntersection(last, end))
-            {
-                MessageBox.Show("Пересечение запрещено!");
-                return;
-            }
-
-            points.Add(end);
-            lines.Add(currentLine);
-            angles.Add(dop_angle);
-
-            currentLine = CreateLine(end, end);
-            canvas.Children.Add(currentLine);
-        }
-
         public void FinishPolygonWithSpace()
         {
             if (!isDrawing || points.Count <= 2) return;
 
-            // фиксируем текущую линию
-            CommitCurrentLine();
+
 
             Point g_c = SE.Get_center();
             PolygonMy poly = new PolygonMy();
@@ -366,4 +322,6 @@ namespace _2_3Laba.Figures
             DetachEvents();
         }
     }
+
+    
 }
